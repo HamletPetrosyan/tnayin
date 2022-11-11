@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Tnayin</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,700;1,700&display=swap"
+		rel="stylesheet">
+	<script src="https://kit.fontawesome.com/ecad28e87a.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+	<div id="control">
+		<div id="info"></div>
+		<button class="cbut" onclick="changeTheme(-1)" style="cursor: pointer"><i class="fa-solid fa-palette"></i></button>
+		<button class="cbut" onclick="main()" style="cursor: pointer"><i class="fa-solid fa-repeat"></i></button>
+		<button class="cbut" onclick="toggleInput()" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+	</div><br>
+
+	<div id="edit" style="display: none">
+		<div class="input">
+			<h1>Handles & Problems</h1>
+			<div class="handlein">
+				<input type="text" placeholder="Name" id="name">
+				<input type="text" placeholder="Codeforces" id="cfhandle">
+				<input type="text" placeholder="AtCoder" id="athandle">
+				<button class="butn" onclick="addHandle()">Add handle</button>
+			</div> <br>
+			<div class="problemin">
+				<input type="checkbox" onclick="togglePlaceholder()" id="checkbox">
+				<label for="checkbox"></label>
+
+				<input type="text" placeholder="1405_E" id="prblm">
+				<button class="butn" onclick="addProblem()">Add problem</button>
+			</div>
+		</div>
+		<br>
+		<hr><br>
+		<div class="tblrow">
+			<div class="tblcol">
+				<table class="table" id="htab">
+					<tbody id="hbdy">
+						<tr>
+							<th> </th>
+							<th>Name</th>
+							<th>Codeforces</th>
+							<th>AtCoder</th>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="tblcol">
+				<table class="table" id="ptab">
+					<tbody id="pbdy">
+						<tr>
+							<th>Type</th>
+							<th>Id</th>
+							<th> </th>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<br><br>
+		<hr>
+		<div class="impexp">
+			<h1>Import & Export</h1>
+			<button class="butn" onclick="importJSON()">Import</button>
+			or
+			<button class="butn" onclick="exportJSON()">Export</button>
+		</div>
+		<br><br>
+	</div>
+	<div id="general">
+		<h1>Homework</h1>
+		<table class="table" id="standings">
+			<tbody id="content">
+				<tr>
+					<th class="num">N</th>
+					<th>Name</th>
+					<th>S</th>
+					<th>P</th>
+					<th><a href="#"><i class="fa-solid fa-list-ul"></i></a></th>
+					<th><a href="#"><i class="fa-solid fa-star"></i></a></th>
+					<th><a href="#"><i class="fa-solid fa-code"></i></a></th>
+					<th><a href="#"><i class="fa-solid fa-film"></i></a></th>
+					<th><a href="#"><i class="fa-solid fa-key"></i></a></th>
+					<th><a href="#"><i class="fa-solid fa-keyboard"></i></a></th>
+					<th><a href="#"><i class="fa-solid fa-heart"></i></a></th>
+				</tr>
+				<tr style="background-color: var(--clr1)">
+					<td class="num">1</td>
+					<td class="tname">Click <i class="fa-solid fa-pen-to-square"></i> to edit handle and problem lists</td>
+					<td>5</td>
+					<td>2</td>
+					<td class="solved">+</td>
+					<td class="solved">+</td>
+					<td class="solved">+1</td>
+					<td class="solved">+</td>
+					<td class="solved">+1</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="num">2</td>
+					<td class="tname">Use <i class="fa-solid fa-repeat"></i> to refresh table and get results</td>
+					<td>3</td>
+					<td>10</td>
+					<td></td>
+					<td></td>
+					<td class="solved">+8</td>
+					<td class="tried">-1</td>
+					<td class="solved">+</td>
+					<td class="solved">+2</td>
+					<td></td>
+				</tr>
+				<tr style="background-color: var(--clr1)">
+					<td class="num">3</td>
+					<td class="tname"><i class="fa-solid fa-palette"></i> is here to switch themes</td>
+					<td>1</td>
+					<td>0</td>
+					<td></td>
+					<td class="tried">-2</td>
+					<td class="solved">+</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+		<br><br>
+	</div>
+	<script src="script.js"></script>
+	<script src="theme.js"></script>
+</body>
+
+</html>
