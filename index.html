@@ -20,7 +20,7 @@
 				<div id="error"></div>
 				<div id="info"></div>
 				<button class="cbut" onclick="changeTheme(-1)" style="cursor: pointer"><i class="fa-solid fa-palette"></i></button>
-				<button class="cbut" onclick="main()" style="cursor: pointer"><i class="fa-solid fa-repeat"></i></button>
+				<button class="cbut" id="upd" onclick="main()" style="cursor: pointer"><i class="fa-solid fa-repeat"></i></button>
 				<button class="cbut" onclick="toggleInput()" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></button>
 			</div><br>
 
@@ -31,14 +31,14 @@
 						<input type="text" placeholder="Name" id="name">
 						<input type="text" placeholder="Codeforces" id="cfhandle">
 						<input type="text" placeholder="AtCoder" id="athandle">
-						<button class="butn" onclick="addHandle()">Add handle</button>
+						<button class="butn" onclick="addHandle()" id="hbutton">Add handle</button>
 					</div> <br>
 					<div class="problemin">
 						<input type="checkbox" onclick="togglePlaceholder()" id="checkbox">
 						<label for="checkbox"></label>
 
 						<input type="text" placeholder="1405_E" id="prblm">
-						<button class="butn" onclick="addProblem()">Add problem</button>
+						<button class="butn" onclick="addProblem()" id="pbutton">Add problem</button>
 					</div>
 				</div>
 				<br>
@@ -146,6 +146,7 @@
 	</div>
 	<script src="script.js"></script>
 	<script src="theme.js"></script>
+	<script src="events.js"></script>
 </body>
 
 </html>

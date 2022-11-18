@@ -210,7 +210,7 @@ async function getRes(i, handle){
 	if(handle.at.length == 0) return result;
 	let time = 0;
 	do {
-		await sleep(Math.max(0, 1000 - (Date.now() - lastreq)));
+		await sleep(Math.max(0, 1200 - (Date.now() - lastreq)));
 		lastreq = Date.now();
 		await fetch('https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + handle.at + '&from_second=' + time).then((response) => {
 			if(response.status >= 200 && response.status <= 299) return response.text();
@@ -244,6 +244,9 @@ async function getRes(i, handle){
 }
 
 async function main(){
+	document.getElementById("upd").disabled = true;
+	document.getElementById("upd").style.cursor = 'not-allowed';
+
 	if(tginput){
 		document.getElementById("general").style.display = "block";
 		document.getElementById("edit").style.display = "none";
@@ -350,6 +353,8 @@ async function main(){
 	tblbody.appendChild(row);
 
 	hideInfo();
+	document.getElementById("upd").disabled = false;
+	document.getElementById("upd").style.cursor = 'pointer';
 }
 
 ///
