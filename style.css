@@ -11,18 +11,34 @@
 }
 
 @keyframes fading {
-    from {opacity: 100%;}
+    from {opacity: 100%; }
     to {opacity: 0%;}
 }
 
-html, body {
-    min-height: 100%;
-    font-family: 'Space Mono', monospace;
-}
-
 body {
+    margin: 0 0 0 0;
+    font-family: 'Space Mono', monospace;
     background-color: var(--backgnd);
     color: var(--clr);
+}
+
+#page-container {
+    position: relative;
+    min-height: 100vh;
+}
+
+#content-wrap {
+    padding-top: 0.5rem;
+    padding-bottom: 2rem;
+}
+
+#footer {
+    padding-left: 1%;
+    padding-right: 1%;
+    position: absolute;
+    bottom: 0;
+    width: 98%;
+    height: 2rem;
 }
 
 a {
@@ -72,6 +88,10 @@ input {
 
 .tname {
     min-width: 200px;
+}
+
+.stats, .stats td {
+    border: none !important;
 }
 
 
@@ -142,6 +162,11 @@ input {
 }
 
 #info {
+    display: inline-block;
+}
+
+#error {
+    color: var(--triedclr);
     display: inline-block;
 }
 

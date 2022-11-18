@@ -4,6 +4,12 @@ let pCnt = 0, hCnt = 0;
 let checkbox = false, tginput = false;
 document.getElementById("checkbox").checked = false;
 
+let lastreq = new Date(0);
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function tableAddProblem(type, id, pl){
 	let tblbody = document.getElementById("pbdy");
 	let row = document.createElement("tr");
@@ -150,48 +156,88 @@ function hideInfo(){
 	document.getElementById("info").style.animation = 'fading 2s forwards';
 }
 
+function setError(message){
+	document.getElementById("error").style.animation = '';
+	document.getElementById("error").innerText = message;
+	document.getElementById("error").style.animation = 'fading 5s forwards';
+}
+
 async function getRes(i, handle){
-	console.log(handle.name);
-	let response = await fetch('https://codeforces.com/api/user.status?handle=' + handle.cf);
-	let data = await response.text();
-	let obj = JSON.parse(data);
+	// console.log(handle.name);
 	
+	let obj = [];
 	let result = {
 		id: i,
 		solved: 0,
 		penalty: 0,
+		error: [false, false],
 		status: Array(problems.length).fill(0)
 	};
 
-	if(handle.cf.length > 0 && obj.status == "OK"){
-		for(let i = obj.result.length - 1; i >= 0; i--){
-			for(let j = 0; j < problems.length; j++){
-				if(problems[j].type != false) continue;
-				if(obj.result[i].problem.contestId == problems[j].id && obj.result[i].problem.index == problems[j].pl && result.status[j] <= 0){
-					if(obj.result[i].verdict == "OK") result.penalty -= result.status[j], result.status[j] = -result.status[j] + 1, result.solved++;
-					else result.status[j]--;
+	// Codeforces
+	if(handle.cf.length > 0){
+		await fetch('https://codeforces.com/api/user.status?language=en&handle=' + handle.cf).then((response) => {
+			if(response.status >= 200 && response.status <= 299) return response.text();
+			else {
+				setError("Codeforces request failed (" + (i + 1) + ")");
+				throw new Error("Codeforces request failed: " + 'https://codeforces.com/api/user.status?language=en&handle=' + handle.cf);
+			}
+		})
+		.then((jsonResponse) => {
+			obj = JSON.parse(jsonResponse);
+			if(obj.status != "OK") {
+				setError(obj.comment);
+				throw new Error(obj.comment);
+			}
+
+			for(let i = obj.result.length - 1; i >= 0; i--){
+				for(let j = 0; j < problems.length; j++){
+					if(problems[j].type != false) continue;
+					if(obj.result[i].problem.contestId == problems[j].id && obj.result[i].problem.index == problems[j].pl && result.status[j] <= 0){
+						if(obj.result[i].verdict == "OK") result.penalty -= result.status[j], result.status[j] = -result.status[j] + 1, result.solved++;
+						else result.status[j]--;
+					}
 				}
 			}
-		}
+		})
+		.catch((error) => {
+			result.error[0] = true;
+			console.log(error);
+		});
 	}
 
+	// AtCoder
 	if(handle.at.length == 0) return result;
-
 	let time = 0;
 	do {
-		response = await fetch('https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + handle.at + '&from_second=' + time);
-		data = await response.text();
-		obj = JSON.parse(data);
-		for(let i = 0; i < obj.length; i++){
-			for(let j = 0; j < problems.length; j++){
-				if(problems[j].type != true) continue;
-				if(obj[i].problem_id == problems[j].id + "_" + problems[j].pl && result.status[j] <= 0){
-					if(obj[i].result == "AC") result.penalty -= result.status[j], result.status[j] = -result.status[j] + 1, result.solved++;
-					else result.status[j]--;
+		await sleep(Math.max(0, 1000 - (Date.now() - lastreq)));
+		lastreq = Date.now();
+		await fetch('https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + handle.at + '&from_second=' + time).then((response) => {
+			if(response.status >= 200 && response.status <= 299) return response.text();
+			else {
+				setError("AtCoder request failed (" + (i + 1) + ")");
+				throw new Error("AtCoder request failed: " + 'https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user=' + handle.at + '&from_second=' + time);
+			}
+		})
+		.then((jsonResponse) => {
+			obj = JSON.parse(jsonResponse);
+			for(let i = 0; i < obj.length; i++){
+				for(let j = 0; j < problems.length; j++){
+					if(problems[j].type != true) continue;
+					if(obj[i].problem_id == problems[j].id + "_" + problems[j].pl && result.status[j] <= 0){
+						if(obj[i].result == "AC") result.penalty -= result.status[j], result.status[j] = -result.status[j] + 1, result.solved++;
+						else result.status[j]--;
+					}
 				}
 			}
-		}
-		time = obj[obj.length - 1].epoch_second + 1;
+			if(obj.length > 0) time = obj[obj.length - 1].epoch_second + 1;
+			else if(time == 0) result.error[1] = true;
+		})
+		.catch((error) => {
+			obj = [];
+			result.error[1] = true;
+			console.log(error);
+		});
 	} while(obj.length == 500);
 
 	return result;
@@ -203,6 +249,11 @@ async function main(){
 		document.getElementById("edit").style.display = "none";
 		tginput = !tginput;
 	}
+
+	let stats = {
+		solved: Array(problems.length).fill(0),
+		tried: Array(problems.length).fill(0)
+	};
 
 	// console.log(handles);
 	// console.log(problems);
@@ -228,7 +279,7 @@ async function main(){
 		return 1;
 	});
 
-	console.log(results);
+	// console.log(results);
 	let prev = -1, clr = false;
 
 	for(let i = 0; i < results.length; i++){
@@ -246,8 +297,9 @@ async function main(){
 
 		cell = document.createElement("td");
 		cell.setAttribute('class', 'tname');
-		cellText = document.createTextNode(handles[results[i].id].name);
-		cell.appendChild(cellText);
+		cell.innerHTML = handles[results[i].id].name + 
+						(results[i].error[0] ? " <span style=\"color: var(--triedclr)\">CF</span>" : "") + 
+						(results[i].error[1] ? " <span style=\"color: var(--triedclr)\">AT</span>" : "");
 		row.appendChild(cell);
 
 		cell = document.createElement("td");
@@ -263,13 +315,39 @@ async function main(){
 		for(let j = 0; j < results[i].status.length; j++){
 			cell = document.createElement("td");
 			res = document.createTextNode(toRes(results[i].status[j]));
-			if(results[i].status[j] < 0) cell.setAttribute('class', 'tried');
-			else if(results[i].status[j] > 0) cell.setAttribute('class', 'solved');
+			if(results[i].status[j] < 0) cell.setAttribute('class', 'tried'), stats.tried[j]++;
+			else if(results[i].status[j] > 0) cell.setAttribute('class', 'solved'), stats.tried[j]++, stats.solved[j]++;
 			cell.appendChild(res);
 			row.appendChild(cell);
 		}
 		tblbody.appendChild(row);
 	}
+
+	let row = document.createElement("tr");
+	row.setAttribute('style', 'background-color: var(--backgnd)');
+	row.setAttribute('class', 'stats');
+	let cell = document.createElement("td");
+	cell.setAttribute('class', 'num');
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	cell.innerHTML = "solved";
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	row.appendChild(cell);
+
+	for(let j = 0; j < stats.solved.length; j++){
+		cell = document.createElement("td");
+		cell.setAttribute('class', 'solved');
+		cell.innerHTML = stats.solved[j] + "<span style=\"color: var(--clr)\">/" + stats.tried[j] + "</span>";
+		cell.appendChild(res);
+		row.appendChild(cell);
+	}
+	tblbody.appendChild(row);
 
 	hideInfo();
 }
@@ -277,7 +355,7 @@ async function main(){
 ///
 
 function importJSON(){
-	let imported = prompt("Paste JSON data here:", "");
+	let imported = prompt("Insert JSON text here:", "");
 	if(imported == null || imported.length == 0) return;
 
 	let obj = JSON.parse(imported);
@@ -291,12 +369,12 @@ function importJSON(){
 		handles[handles.length] = obj.handles[i];
 		tableAddHandle(handles[handles.length - 1].name, handles[handles.length - 1].cf, handles[handles.length - 1].at);
 	}
-	console.log(problems, handles);
+	// console.log(problems, handles);
 }
 
 function exportJSON(){
 	navigator.clipboard.writeText("{\"problems\": " + JSON.stringify(problems) + ", \"handles\": " + JSON.stringify(handles) + "}");
-	alert("Copied JSON text");
+	alert("Copied JSON text to the clipboard");
 }
 
 function togglePlaceholder(){
