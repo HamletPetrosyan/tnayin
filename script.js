@@ -334,7 +334,7 @@ async function main(){
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
-	cell.innerHTML = "solved";
+	cell.innerHTML = "<span style=\"color: var(--solvedclr)\">solved</span>/tried";
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
